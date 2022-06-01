@@ -448,7 +448,6 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) error {
 	}
 
 	if d.sequencer != nil {
-		d.logger.Infow("NACK_DEBUG", "in", extPkt.Packet.SequenceNumber, "out", tp.rtp.sequenceNumber) // REMOVE
 		meta := d.sequencer.push(extPkt.Packet.SequenceNumber, tp.rtp.sequenceNumber, tp.rtp.timestamp, int8(layer))
 		if meta != nil && tp.vp8 != nil {
 			meta.packVP8(tp.vp8.Header)
