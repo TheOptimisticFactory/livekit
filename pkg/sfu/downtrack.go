@@ -1127,6 +1127,9 @@ func (d *DownTrack) handleRTCP(bytes []byte) {
 				numNACKs += uint32(len(packetList))
 				nacks = append(nacks, packetList...)
 			}
+			if len(nacks) > 0 {
+				d.logger.Infow("NACK_DEBUG", "start", nacks[0], "last", nacks[len(nacks)-1], "len", len(nacks))
+			}
 			go d.retransmitPackets(nacks)
 
 		case *rtcp.TransportLayerCC:
