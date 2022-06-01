@@ -35,7 +35,7 @@ type pendingPacket struct {
 type ExtPacket struct {
 	VideoLayer
 	Arrival              int64
-	Packet               *rtp.Packet
+	Packet               rtp.Packet
 	Payload              interface{}
 	KeyFrame             bool
 	RawPacket            []byte
@@ -381,7 +381,7 @@ func (b *Buffer) calc(pkt []byte, arrivalTime int64) {
 	b.updateStreamState(&p, arrivalTime)
 	b.processHeaderExtensions(&p, arrivalTime)
 
-	ep := b.getExtPacket(pb, &p, arrivalTime)
+	ep := b.getExtPacket(pb, p, arrivalTime)
 	if ep == nil {
 		return
 	}
@@ -436,7 +436,7 @@ func (b *Buffer) processHeaderExtensions(p *rtp.Packet, arrivalTime int64) {
 	}
 }
 
-func (b *Buffer) getExtPacket(rawPacket []byte, rtpPacket *rtp.Packet, arrivalTime int64) *ExtPacket {
+func (b *Buffer) getExtPacket(rawPacket []byte, rtpPacket rtp.Packet, arrivalTime int64) *ExtPacket {
 	ep := &ExtPacket{
 		Packet:    rtpPacket,
 		Arrival:   arrivalTime,
@@ -454,7 +454,7 @@ func (b *Buffer) getExtPacket(rawPacket []byte, rtpPacket *rtp.Packet, arrivalTi
 
 	ep.Temporal = 0
 	if b.ddParser != nil {
-		ddVal, videoLayer, err := b.ddParser.Parse(ep.Packet)
+		ddVal, videoLayer, err := b.ddParser.Parse(&ep.Packet)
 		if err == nil && ddVal != nil {
 			ep.DependencyDescriptor = ddVal
 			ep.VideoLayer = videoLayer
