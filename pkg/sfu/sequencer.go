@@ -175,12 +175,14 @@ func (s *sequencer) getPacketsMeta(seqNo []uint16) []packetMeta {
 		diff := s.headSN - sn
 		if diff > (1<<15) || int(diff) >= s.max {
 			// out-of-order from head (should not happen) or too old
+			s.logger.Infow("NACK_DEBUG: old", "sn", sn, "headSN", s.headSN, "diff", diff, "max", s.max) // REMOVE
 			continue
 		}
 
 		slot := s.wrap(s.step - int(diff) - 1)
 		seq := &s.seq[slot]
 		if seq.targetSeqNo != sn {
+			s.logger.Infow("NACK_DEBUG: incorrect", "sn", sn, "targetSeq", seq.targetSeqNo) // REMOVE
 			continue
 		}
 
