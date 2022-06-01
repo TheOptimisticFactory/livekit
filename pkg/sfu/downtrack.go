@@ -436,10 +436,10 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) error {
 		incomingVP8, _ := extPkt.Payload.(buffer.VP8)
 
 		outbuf := &payload
-		if incomingVP8.HeaderSize != tp.vp8.Header.HeaderSize {
-			pool = PacketFactory.Get().(*[]byte)
-			outbuf = pool
-		}
+		//if incomingVP8.HeaderSize != tp.vp8.Header.HeaderSize {
+		pool = PacketFactory.Get().(*[]byte)
+		outbuf = pool
+		//}
 		payload, err = d.translateVP8PacketTo(&extPkt.Packet, &incomingVP8, tp.vp8.Header, outbuf)
 		if err != nil {
 			d.pktsDropped.Inc()
@@ -448,6 +448,7 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) error {
 	}
 
 	if d.sequencer != nil {
+		d.logger.Infow("NACK_DEBUG", "in", extPkt.Packet.SequenceNumber, "out", tp.rtp.sequenceNumber) // REMOVE
 		meta := d.sequencer.push(extPkt.Packet.SequenceNumber, tp.rtp.sequenceNumber, tp.rtp.timestamp, int8(layer))
 		if meta != nil && tp.vp8 != nil {
 			meta.packVP8(tp.vp8.Header)
